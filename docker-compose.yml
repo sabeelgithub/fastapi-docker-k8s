@@ -20,6 +20,7 @@ services:
       - postgres-data:/var/lib/postgresql/data
     ports:
       - "5431:5432"
+
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=password

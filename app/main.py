@@ -16,8 +16,14 @@ async def create_user(user:UserBase,db:db_dependency):
     db_user = models.User(name=user.name,age=user.age)
     db.add(db_user)
     db.commit()
-    db.refresh(db_user)
     return {"message":"User created successfully","status":status.HTTP_200_OK}
+
+@app.get("/read-users",response_model=List[UserBase])
+async def read_users(db:db_dependency):
+    users = db.query(models.User).all()
+    return users
+
+
 
 
 
