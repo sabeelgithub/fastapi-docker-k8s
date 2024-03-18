@@ -1,0 +1,94 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: fastapi-app-configuration
+  labels:
+    app: fastapi-app
+data:
+  POSTGRES_SERVER: postgres-service
+  POSTGRES_PORT: "5432"
+  POSTGRES_DB: postgres-fastapi
+  POSTGRES_USER: postgres
+  POSTGRES_SYNC_PREFIX: postgresql://
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: fastapi-app
+  name: fastapi-app-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: fastapi-app
+  template:
+    metadata:
+      labels:
+        app: fastapi-app
+    spec:
+      containers:
+      - name: fastapi-app
+        image: fastapi-web
+        ports:
+        - containerPort: 80
+        readinessProbe:
+            httpGet:
+              port: 80
+              path: /docs
+            initialDelaySeconds: 15
+        livenessProbe:
+            httpGet:
+              port: 80
+              path: /docs
+            initialDelaySeconds: 15
+            periodSeconds: 15
+        env:
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: password
+              name: postgres-credentials
+        envFrom:
+          - configMapRef:
+              name: fastapi-app-configuration
+        initContainers:
+      - name: init-db
+        image: postgres:13
+        command:
+        - sh
+        - -c
+        - until pg_isready -h ${POSTGRES_HOST};  do echo waiting for database; sleep
+          2; done;
+        env:
+        - name: POSTGRES_HOST
+          value: postgres-service
+      - name: perform-migrations
+        image: fastapi-web
+        command: ["alembic", "upgrade", "head"]
+        env:
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgres-credentials
+              key: password
+        envFrom:
+          - configMapRef:
+              name: fastapi-app-configuration
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: fastapi-app
+  name: fastapi-app-service
+spec:
+  selector:
+    app: fastapi-app
+  ports:
+  - port: 80
+    targetPort: 80
+  type: NodePort

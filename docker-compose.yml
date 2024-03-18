@@ -1,7 +1,7 @@
 services:
   web:
     image: python-fastapi
-    container_name: fastapi-docker
+    container_name: fastapi-docker-k8s
     build:
       context: .
       dockerfile: Dockerfile

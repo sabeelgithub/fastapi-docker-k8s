@@ -1,7 +1,6 @@
 from fastapi import FastAPI,HTTPException,Depends,status
 from typing import List,Annotated
-from app import models
-# import models
+from . import models
 from app.database import engine,get_db
 from sqlalchemy.orm import Session
 from app.schemas import UserBase
