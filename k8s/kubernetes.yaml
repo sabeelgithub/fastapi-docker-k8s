@@ -54,29 +54,29 @@ spec:
         envFrom:
           - configMapRef:
               name: fastapi-app-configuration
-        initContainers:
-      - name: init-db
-        image: postgres:13
-        command:
-        - sh
-        - -c
-        - until pg_isready -h ${POSTGRES_HOST};  do echo waiting for database; sleep
-          2; done;
-        env:
-        - name: POSTGRES_HOST
-          value: postgres-service
-      - name: perform-migrations
-        image: fastapi-web
-        command: ["alembic", "upgrade", "head"]
-        env:
-        - name: POSTGRES_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: postgres-credentials
-              key: password
-        envFrom:
-          - configMapRef:
-              name: fastapi-app-configuration
+      #   initContainers:
+      # - name: init-db
+      #   image: postgres:13
+      #   command:
+      #   - sh
+      #   - -c
+      #   - until pg_isready -h ${POSTGRES_HOST};  do echo waiting for database; sleep
+      #     2; done;
+      #   env:
+      #   - name: POSTGRES_HOST
+      #     value: postgres-service
+      # - name: perform-migrations
+      #   image: fastapi-web
+      #   command: ["alembic", "upgrade", "head"]
+      #   env:
+      #   - name: POSTGRES_PASSWORD
+      #     valueFrom:
+      #       secretKeyRef:
+      #         name: postgres-credentials
+      #         key: password
+      #   envFrom:
+      #     - configMapRef:
+      #         name: fastapi-app-configuration
 ---
 
 apiVersion: v1
