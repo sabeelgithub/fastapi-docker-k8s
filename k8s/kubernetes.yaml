@@ -78,7 +78,6 @@ spec:
       #     - configMapRef:
       #         name: fastapi-app-configuration
 ---
-
 apiVersion: v1
 kind: Service
 metadata:

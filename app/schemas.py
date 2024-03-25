@@ -6,6 +6,12 @@ class UserBase(BaseModel):
     email:str
     name:str
     age:int
+class UserRead(BaseModel):
+    id:int
+    username:str
+    email:str
+    name:str
+    age:int
 
-class ReadEmail(BaseModel):
+class UpdateEmail(BaseModel):
     email:str
